@@ -33,9 +33,16 @@ RUN git clone --branch ${N8N_VERSION} https://github.com/DiegoSVilla/n8n.git /us
 WORKDIR /usr/src/app
 
 # Install all required dependencies (from package.json)
+# Install pnpm globally first
 RUN npm install -g pnpm@10.2.1
-ENV PNPM_HOME=/usr/local/share/pnpm-global
-ENV PATH=$PNPM_HOME/bin:$PATH
+
+# Set up the global bin directory and ensure it's in the PATH for pnpm
+RUN mkdir -p /usr/local/share/pnpm-global && \
+    pnpm config set prefix /usr/local/share/pnpm-global && \
+    echo "export PNPM_HOME=/usr/local/share/pnpm-global" >> ~/.bashrc && \
+    echo "export PATH=\$PNPM_HOME/bin:\$PATH" >> ~/.bashrc
+
+# Install n8n globally using pnpm
 RUN pnpm add -g n8n@${N8N_VERSION}
 # Optional: Remove unnecessary files to reduce the image size
 RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
