@@ -33,7 +33,7 @@ RUN git clone --branch ${N8N_VERSION} https://github.com/DiegoSVilla/n8n.git /us
 WORKDIR /usr/src/app
 
 # Install all required dependencies (from package.json)
-RUN npm install --omit=dev --legacy-peer-deps
+RUN npm install -g pnpm@10.2.1
 
 # Optional: Remove unnecessary files to reduce the image size
 RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
