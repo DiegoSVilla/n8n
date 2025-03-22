@@ -32,23 +32,18 @@ RUN git clone --branch ${N8N_VERSION} https://github.com/DiegoSVilla/n8n.git /us
 # Change working directory to the cloned n8n repo
 WORKDIR /usr/src/app
 
-# Install all required dependencies (from package.json)
-# Install pnpm globally first
-RUN npm install -g pnpm@10.2.1
+# Install n8n globally using npm
+RUN set -eux; \
+    npm install -g --omit=dev n8n@${N8N_VERSION} --ignore-scripts && \
+    npm rebuild --prefix=/usr/local/lib/node_modules/n8n sqlite3 && \
+    rm -rf /usr/local/lib/node_modules/n8n/node_modules/@n8n/chat && \
+    rm -rf /usr/local/lib/node_modules/n8n/node_modules/@n8n/design-system && \
+    rm -rf /usr/local/lib/node_modules/n8n/node_modules/n8n-editor-ui/node_modules && \
+    find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm -f && \
+    rm -rf /root/.npm
 
-# Set up the global bin directory and ensure it's in the PATH for pnpm
-RUN mkdir -p /usr/local/share/pnpm-global && \
-    pnpm config set prefix /usr/local/share/pnpm-global && \
-    echo "export PNPM_HOME=/usr/local/share/pnpm-global" >> ~/.bashrc && \
-    echo "export PATH=\$PNPM_HOME/bin:\$PATH" >> ~/.bashrc
-
-# Install n8n globally using pnpm
-RUN pnpm add -g n8n@${N8N_VERSION}
 # Optional: Remove unnecessary files to reduce the image size
 RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
-
-# Optional: If needed, build n8n (if there are build steps required for your fork, uncomment below)
-# RUN npm run build  # Uncomment if your fork requires building
 
 # Setup the Task Runner Launcher (optional, remove if not needed)
 ARG TARGETPLATFORM
@@ -60,22 +55,23 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then export ARCH_NAME="amd64"; \
     mkdir /launcher-temp && \
     cd /launcher-temp && \
     wget https://github.com/DiegoSVilla/task-runner-launcher/releases/download/${LAUNCHER_VERSION}/task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz && \
-		wget https://github.com/DiegoSVilla/task-runner-launcher/releases/download/${LAUNCHER_VERSION}/task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz.sha256 && \
-		echo "$(cat task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz.sha256) task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz" > checksum.sha256 && \
+    wget https://github.com/DiegoSVilla/task-runner-launcher/releases/download/${LAUNCHER_VERSION}/task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz.sha256 && \
+    echo "$(cat task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz.sha256) task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz" > checksum.sha256 && \
     sha256sum -c checksum.sha256 && \
     tar xvf task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz --directory=/usr/local/bin && \
     cd - && \
     rm -r /launcher-temp
 
-
 # Copy the custom docker-entrypoint.sh (ensure this file exists in your fork)
 COPY docker-entrypoint.sh /
 RUN apt-get update && apt-get install -y tini
+
 # Create necessary directories and ensure correct permissions
-RUN \
-    mkdir .n8n && \
+RUN mkdir .n8n && \
     chown node:node .n8n
+
 RUN chmod +x /docker-entrypoint.sh
+
 # Set the shell and user
 ENV SHELL /bin/sh
 USER node
