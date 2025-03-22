@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
 
 # Clone your forked version of n8n from GitHub (or use a local copy)
 # This step clones the `n8n` repository (this should be your local repo or forked version)
-RUN git clone --branch main https://github.com/DiegoSVilla/n8n.git /usr/src/app
+RUN git clone --branch master https://github.com/DiegoSVilla/n8n.git /usr/src/app
 
 # Change working directory to the cloned n8n repo
 WORKDIR /usr/src/app
