@@ -34,7 +34,7 @@ WORKDIR /usr/src/app
 
 # Install all required dependencies (from package.json)
 RUN npm install -g pnpm@10.2.1
-
+RUN pnpm add -g n8n@${N8N_VERSION}
 # Optional: Remove unnecessary files to reduce the image size
 RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
 
