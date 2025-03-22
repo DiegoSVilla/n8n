@@ -61,7 +61,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then export ARCH_NAME="amd64"; \
 
 # Copy the custom docker-entrypoint.sh (ensure this file exists in your fork)
 COPY docker-entrypoint.sh /
-
+RUN apt-get update && apt-get install -y tini
 # Create necessary directories and ensure correct permissions
 RUN \
     mkdir .n8n && \
