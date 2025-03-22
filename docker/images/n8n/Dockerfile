@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y tini
 RUN \
     mkdir .n8n && \
     chown node:node .n8n
-
+RUN chmod +x /docker-entrypoint.sh
 # Set the shell and user
 ENV SHELL /bin/sh
 USER node
