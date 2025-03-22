@@ -2,12 +2,14 @@
 FROM node:20-slim
 
 # Set build arguments
-ARG N8N_VERSION=latest  # Default to latest, can be changed to a specific version/branch
+ARG N8N_VERSION=latest  
+# Default to latest, can be changed to a specific version/branch
 
 # Labels for image metadata
 LABEL org.opencontainers.image.title="n8n"
 LABEL org.opencontainers.image.description="Workflow Automation Tool"
-LABEL org.opencontainers.image.source="https://github.com/DiegoSVilla/n8n"  # Reference to your fork
+LABEL org.opencontainers.image.source="https://github.com/DiegoSVilla/n8n"  
+# Reference to your fork
 LABEL org.opencontainers.image.url="https://n8n.io"
 LABEL org.opencontainers.image.version=${N8N_VERSION}
 
