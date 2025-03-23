@@ -2,12 +2,12 @@
 FROM node:20
 
 # Set build arguments
-ARG N8N_VERSION=latest  
+ARG N8N_VERSION=latest  # Default to latest version, can be changed to a specific version like "1.1.1"
 
 # Labels for image metadata
 LABEL org.opencontainers.image.title="n8n"
 LABEL org.opencontainers.image.description="Workflow Automation Tool"
-LABEL org.opencontainers.image.source="https://github.com/DiegoSVilla/n8n"  
+LABEL org.opencontainers.image.source="https://github.com/DiegoSVilla/n8n"
 LABEL org.opencontainers.image.url="https://n8n.io"
 LABEL org.opencontainers.image.version=${N8N_VERSION}
 
@@ -24,18 +24,20 @@ RUN apt-get update && apt-get install -y \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install pnpm (needed for workspaces)
+RUN npm install -g pnpm@10.2.1
+
 # Clone your forked version of n8n from GitHub (or use a local copy)
-# This step clones the `n8n` repository (this should be your local repo or forked version)
-RUN git clone --branch master https://github.com/DiegoSVilla/n8n.git /usr/src/app
+RUN git clone --branch ${N8N_VERSION} https://github.com/DiegoSVilla/n8n.git /usr/src/app
 
 # Change working directory to the cloned n8n repo
 WORKDIR /usr/src/app
 
-# Install dependencies from the cloned repository
-RUN npm install --omit=dev
+# Install dependencies using pnpm (workspaces support)
+RUN pnpm install --frozen-lockfile
 
 # Build n8n (if necessary)
-RUN npm run build
+RUN pnpm build
 
 # Optional: Remove unnecessary files to reduce the image size
 RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
