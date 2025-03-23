@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 RUN npm install -g pnpm@10.2.1
 
 # Clone your forked version of n8n from GitHub (or use a local copy)
-RUN git clone --branch ${N8N_VERSION} https://github.com/DiegoSVilla/n8n.git /usr/src/app
+RUN git clone --branch master https://github.com/DiegoSVilla/n8n.git /usr/src/app
 
 # Change working directory to the cloned n8n repo
 WORKDIR /usr/src/app
