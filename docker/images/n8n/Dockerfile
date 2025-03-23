@@ -38,9 +38,8 @@ RUN pnpm install --frozen-lockfile
 
 # Build n8n (if necessary)
 RUN pnpm build
-
-# Optional: Remove unnecessary files to reduce the image size
-RUN rm -rf /usr/src/app/test /usr/src/app/docs /usr/src/app/.git
+# Link n8n globally so it can be executed anywhere
+RUN ln -s /usr/src/app/packages/cli/bin/n8n /usr/local/bin/n8n
 
 # Setup the Task Runner Launcher (optional, remove if not needed)
 ARG TARGETPLATFORM
